@@ -1,0 +1,299 @@
+// Phantombuster configuration {
+
+"phantombuster command: nodejs"
+"phantombuster package: 5"
+"phantombuster flags: save-folder"
+"phantombuster dependencies: lib-StoreUtilities.js, lib-Facebook.js"
+
+const Buster = require("phantombuster")
+const buster = new Buster()
+
+const Nick = require("nickjs")
+const nick = new Nick()
+const StoreUtilities = require("./lib-StoreUtilities")
+const utils = new StoreUtilities(nick, buster)
+const Facebook = require("./lib-Facebook")
+const facebook = new Facebook(nick, buster, utils)
+// }
+
+// require local obejct as follow
+/*
+{
+	"cookie_user": "",
+	"cookie_xs": "",
+	"google_url": ""
+}
+*/
+
+
+
+//function to open tab and visit a website
+async function open_tab(link){
+	try{
+	const tab = await nick.newTab()
+	
+
+
+	
+	
+	console.log("tab open")
+	await tab.open(link)
+	console.log("link open")
+	// It's considered a best-practice to always wait for the DOM element that interests you
+	// when manipulating a website (like when clicking a button or loading a page)
+
+	
+	return tab
+}
+ catch(err) {		
+  console.log("error opening tab", err)
+}
+}
+
+pageTimeout = 10000
+async function random_wait(tab){
+//get random number from 1 to 10
+random_number = Math.floor((Math.random() * 10) + 1)
+await tab.scroll(0,random_number)
+await tab.scroll(0,-random_number)
+await tab.wait(random_number*1000)
+}
+
+/*
+// issue with login for new device
+//facebook login function
+async function  fb_login(password, email){
+try {	
+main_tab = await	open_tab("https://www.facebook.com/")
+await random_wait(main_tab)
+await main_tab.waitUntilPresent("#email", pageTimeout)
+await main_tab.sendKeys("#email", email)
+console.log("email taped")
+await main_tab.waitUntilPresent("#pass", pageTimeout)
+await main_tab.sendKeys("#pass", password)
+await random_wait(main_tab)
+console.log("password taped")	
+main_tab.click("#loginbutton")
+console.log("clicked login buton")
+//wait for news feed loaded
+await main_tab.waitUntilPresent("._5u5j",  pageTimeout*2)
+console.log("login completed")
+return main_tab
+} catch (err) {
+//send email notification about wrong login	
+subject = "reddit account login issue"
+text = "The following account doesn't look to work" + email 
+buster.mail(subject, text)
+}
+}
+
+
+*/
+//deprecated send message without line break
+async function send_fb_message(url, message, tab){
+	await tab.open(url)
+	// get url to 
+	await tab.wait(1000)
+	await random_wait(tab)
+	profile_url = await tab.getUrl()
+	profile_extension = profile_url.substring(profile_url.indexOf("facebook.com/")+13)
+	selector = 'a['+ 'href*="/messages/t/' + profile_extension + '"]'
+	await tab.waitUntilPresent(selector)
+	await tab.click(selector)
+	console.log("open chat tab")
+	await tab.wait(1000)
+	await tab.waitUntilPresent("._5rpu")
+
+
+	//type actuall message
+	await tab.sendKeys("._5rpu", message)
+try {
+  const path = await tab.screenshot("message_taped.jpg")
+  console.log("Screenshot saved at")
+  // Your screenshot is available at this path
+} catch (err) {
+  console.log("Could not take a screenshot:", err)
+}	
+	//send by clicking on send buton
+	
+
+	await tab.sendKeys("._5rpu", message)
+
+
+	await tab.click('[label=send]')
+	await tab.wait(1000)
+	await tab.click(".close")
+	console.log("message send")
+}
+
+async function open_chat_tab(url, tab){
+		await tab.open(url)
+	// get url to 
+	await tab.wait(1000)
+	await random_wait(tab)
+	profile_url = await tab.getUrl()
+	profile_extension = profile_url.substring(profile_url.indexOf("facebook.com/")+13)
+	selector = 'a['+ 'href*="/messages/t/' + profile_extension + '"]'
+	await tab.waitUntilPresent(selector)
+	await tab.click(selector)
+	console.log("open chat tab")
+	await tab.wait(1000)
+	await tab.waitUntilPresent("._5rpu")
+	
+}
+
+async function get_name_script(arr, callback){
+	stemp = document.querySelector('._2nlw')
+	stemp = stemp.text
+	
+	stemp = stemp.slice(0,stemp.indexOf(' '))
+	; 
+callback(null, stemp)
+	
+}
+
+async function type_line(line, tab){
+	await tab.sendKeys("._5rpu", line)
+	await tab.sendKeys("._5rpu", '\r')
+}
+
+
+
+
+async function send_and_close_tab(tab){
+	await tab.wait(500)
+	await tab.waitUntilPresent('[label=send]')
+	//await tab.evaluate(send_script)
+	await tab.click("[label=send]")
+	await tab.wait(1000)
+
+
+	
+	
+	await tab.wait(500)
+	console.log("message send")	
+}
+async function get_name(tab){
+try{
+ name = 	await tab.evaluate(get_name_script)
+ console.log("consol script tur ")
+ console.log(name)
+return name
+	
+} catch (err) {
+  name = " "
+  return name
+}
+}
+
+
+async function main(){
+//
+//
+// get agent object
+local_object = await  buster.getAgentObject()
+
+
+
+
+	
+	
+//
+//
+//part 1 initiatialisation
+
+//get list of link
+link_list = await utils.getDataFromCsv(local_object.google_url, "url_list")
+console.log(link_list)
+
+
+Number_per_day = await utils.getDataFromCsv(local_object.google_url, "Number_per_day")
+Number_per_day = Number_per_day[0]
+console.log("I will send " + Number_per_day + "messages per day")
+
+main_tab = await	open_tab("https://www.facebook.com/")
+log_control = await facebook.login(main_tab, local_object.cookie_user, local_object.cookie_xs)
+//console.log("login completed")
+//console.log(log_control)
+//get column with message 
+message = await utils.getDataFromCsv(local_object.google_url, "message")
+
+//restrict to firt line
+message = message[0]
+console.log(message)
+//console.log(message)
+messqge_seq = message.split('\n')
+
+//console.log(messqge_seq)
+
+
+//
+//
+//part 2 loop to send all the messages
+
+// set sending sequence if not set
+if (typeof local_object["Stemp_log_seq"] == "undefined") {
+local_object.Stemp_log_seq = Array.from(Array(link_list.length).keys())
+// save sending sequence on local object
+buster.setAgentObject(local_object)
+	
+}
+
+
+// Number of message to be send = user parmeter or number of remaining link in the list
+if (local_object.Stemp_log_seq.length < Number_per_day){
+	Number_per_day = local_object.Stemp_log_seq.length
+} else {
+	
+	Number_per_day = Number_per_day
+}
+
+// remove from Stemp_log_seq the login which will be contacted today
+
+
+var i;
+for (i = 0; i < Number_per_day; i++) { 
+	//select url based on Stemp_log_seq value
+	console.log("in the loop to send messages")
+	//console.log("i is" + i)
+	//console.log('N per day is '+ Number_per_day )
+	//console.log(link_list)
+	//console.log(local_object.Stemp_log_seq)
+	url = link_list[local_object.Stemp_log_seq[i]]
+	console.log(url)
+	await open_chat_tab(url, main_tab)
+	console.log('tab open')
+
+	//try to get user name
+	name = await get_name(main_tab)
+	console.log(name)
+
+	for (ii = 0; ii < messqge_seq.length; ii++){
+	lines = messqge_seq[messqge_seq.length - ii - 1]	
+	if (lines.includes('##Name') == false) {
+	
+
+		await type_line( lines, main_tab)	
+		//console.log('key send')
+	} else {
+		lines = await lines.replace('##Name', name)
+		await type_line( lines, main_tab)
+		//console.log('taped line with name')
+	}
+	console.log(ii)
+	}
+//console.log('exit typing loop')
+
+
+	await send_and_close_tab(main_tab)
+}
+
+local_object.Stemp_log_seq = local_object.Stemp_log_seq.slice(Number_per_day)
+await buster.setAgentObject(local_object)
+
+
+nick.exit()
+}
+
+main()
+
