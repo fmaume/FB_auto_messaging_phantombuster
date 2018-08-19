@@ -17,9 +17,9 @@ In this depository you will find the required code to send automated Facebook me
 
 5. Go to setting of you API:
 
-  ⋅⋅5a. Copy past the code from Agent_object under Agent Object
+  5a. Copy past the code from Agent_object under Agent Object
 
-  ⋅⋅5b. Replace cookie_user parameter by your own
+    ⋅⋅5b. Replace cookie_user parameter by your own
 
   ⋅⋅5c. Replace cookie_xs by your own
 
