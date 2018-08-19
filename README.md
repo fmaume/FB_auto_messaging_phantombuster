@@ -27,5 +27,7 @@ In this depository you will find the required code to send automated Facebook me
 
 ## how to get cookie parameter?
 On Chrome simple type F12 to open developer tool. Then go under Applications tab.
+
 For Mozila: https://developer.mozilla.org/en-US/docs/Tools/Storage_Inspector
+
 For Safari: https://www.macobserver.com/tmo/article/see_full_cookie_details_in_safari_5.1
