@@ -17,11 +17,11 @@ In this depository you will find the required code to send automated Facebook me
 
 5. Go to setting of you API:
 
-  * 5a. Copy past the code from Agent_object under Agent Object
-  * 5b. Replace cookie_user parameter by your own
-  * 5c. Replace cookie_xs by your own
-  * 5d.  Replace google_url by a link to your own google file
-  * 5e. Select Repetitively once a days or once every 2 days (you can use advance setting if you which to setup specific time)
+  * 5a Copy past the code from Agent_object under Agent Object
+  * 5b Replace cookie_user parameter by your own
+  * 5c Replace cookie_xs by your own
+  * 5d  Replace google_url by a link to your own google file
+  * 5e Select Repetitively once a days or once every 2 days (you can use advance setting if you which to setup specific time)
   
 6. You are all set. The automation will run until all facebook account you put in the google doc are contacted.
 
