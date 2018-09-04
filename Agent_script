@@ -168,12 +168,12 @@ async function send_and_close_tab(tab){
 	await tab.wait(1000)
 
 
-	await tab.click(".close")
+	
 	
 	await tab.wait(500)
 	console.log("message send")
 	
-	
+	await tab.click(".close")
 	
 	console.log('window closed')
 }
