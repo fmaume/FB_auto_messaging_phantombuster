@@ -168,10 +168,14 @@ async function send_and_close_tab(tab){
 	await tab.wait(1000)
 
 
-	
+	await tab.click(".close")
 	
 	await tab.wait(500)
-	console.log("message send")	
+	console.log("message send")
+	
+	
+	
+	console.log('window closed')
 }
 async function get_name(tab){
 try{
@@ -296,4 +300,3 @@ nick.exit()
 }
 
 main()
-
