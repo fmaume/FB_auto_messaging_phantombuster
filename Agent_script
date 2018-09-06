@@ -133,9 +133,17 @@ async function open_chat_tab(url, tab){
 	await random_wait(tab)
 	profile_url = await tab.getUrl()
 	profile_extension = profile_url.substring(profile_url.indexOf("facebook.com/")+13)
+	try{
 	selector = 'a['+ 'href*="/messages/t/' + profile_extension + '"]'
 	await tab.waitUntilPresent(selector)
 	await tab.click(selector)
+	} catch (err) {
+		//handled profile with url like https://www.facebook.com/profile.php?id=xxxxx
+		profile_extension = profile_extension.substring(profile_extension.indexOf("php?id=")+7)
+		selector = 'a['+ 'href*="/messages/t/' + profile_extension + '"]'
+		await tab.waitUntilPresent(selector)
+		await tab.click(selector)
+	}
 	console.log("open chat tab")
 	await tab.wait(1000)
 	await tab.waitUntilPresent("._5rpu")
