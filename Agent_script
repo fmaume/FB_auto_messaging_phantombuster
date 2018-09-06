@@ -153,27 +153,44 @@ callback(null, stemp)
 }
 
 async function type_line(line, tab){
-	await tab.sendKeys("._5rpu", line)
-	await tab.sendKeys("._5rpu", '\r')
+	await tab.wait(500)
+	await tab.sendKeys("#myid", line)
+	await tab.sendKeys("#myid", '\r')
 }
 
-
+//function to mark proper entry fild with specific id
+function console_script_marking(arr, callback){
+	stemp = document.querySelectorAll('._5rpu')
+	if(stemp.length == 2){
+		stemp = stemp[1]
+		
+	}else {
+		stemp = stemp[0]	
+	}	
+	stemp.id = 'myid';
+callback(null)
+}
 
 
 async function send_and_close_tab(tab){
 	await tab.wait(500)
+	try{
 	await tab.waitUntilPresent('[label=send]')
 	//await tab.evaluate(send_script)
 	await tab.click("[label=send]")
 	await tab.wait(1000)
+	} catch (err) {
+	await tab.waitUntilPresent('._2lum')	
+	await tab.click("._2lum")
+	await tab.wait(1000)		
+	}	
 
-
-	
+	await tab.click(".close")
 	
 	await tab.wait(500)
 	console.log("message send")
 	
-	await tab.click(".close")
+	
 	
 	console.log('window closed')
 }
@@ -271,7 +288,11 @@ for (i = 0; i < Number_per_day; i++) {
 	//try to get user name
 	name = await get_name(main_tab)
 	console.log(name)
-
+	
+	await main_tab.wait(2000)
+	//mark the proper send field
+	await main_tab.evaluate(console_script_marking)
+	
 	for (ii = 0; ii < messqge_seq.length; ii++){
 	lines = messqge_seq[messqge_seq.length - ii - 1]	
 	if (lines.includes('##Name') == false) {
@@ -285,9 +306,16 @@ for (i = 0; i < Number_per_day; i++) {
 		//console.log('taped line with name')
 	}
 	console.log(ii)
+	//debug fuction to get screenshot line per line
+	//image_name = 'image' + ii + ".jpg"
+	//path1 = await main_tab.screenshot(image_name)
+	//await buster.save(path1)
+
 	}
 //console.log('exit typing loop')
-
+	//debug function for screenshot
+	//const path = await main_tab.screenshot("image.jpg")
+	//await buster.save(path)
 
 	await send_and_close_tab(main_tab)
 }
@@ -300,3 +328,4 @@ nick.exit()
 }
 
 main()
+
